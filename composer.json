@@ -4,7 +4,8 @@
     "keywords": [
         "Enzo Innocenzi",
         "laravel",
-        "bluesky-notification-channel"
+        "bluesky",
+        "notification-channel"
     ],
     "homepage": "https://github.com/innocenzi/bluesky-notification-channel",
     "license": "MIT",
@@ -17,25 +18,22 @@
     ],
     "require": {
         "php": "^8.1",
-        "spatie/laravel-package-tools": "^1.14.0",
+        "spatie/laravel-package-tools": "^1.16.2",
         "illuminate/contracts": "^10.0"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^2.14",
         "friendsofphp/php-cs-fixer": "^3.49",
-        "guzzlehttp/guzzle": "^7.8",
-        "laravel/pint": "^1.0",
-        "nunomaduro/collision": "^7.8",
-        "orchestra/testbench": "^8.8",
-        "pestphp/pest": "^2.20",
-        "pestphp/pest-plugin-arch": "^2.5",
-        "pestphp/pest-plugin-laravel": "^2.0",
-        "spatie/laravel-ray": "^1.26"
+        "guzzlehttp/guzzle": "^7.8.1",
+        "nunomaduro/collision": "^7.10",
+        "orchestra/testbench": "^8.21.1",
+        "pestphp/pest": "^2.33.4",
+        "pestphp/pest-plugin-arch": "^2.7",
+        "pestphp/pest-plugin-laravel": "^2.2",
+        "spatie/laravel-ray": "^1.35"
     },
     "autoload": {
         "psr-4": {
-            "NotificationChannels\\Bluesky\\": "src/",
-            "NotificationChannels\\Bluesky\\Database\\Factories\\": "database/factories/"
+            "NotificationChannels\\Bluesky\\": "src/"
         }
     },
     "autoload-dev": {
@@ -45,7 +43,10 @@
         }
     },
     "scripts": {
-        "post-autoload-dump": "@composer run prepare",
+				"post-autoload-dump": [
+						"@composer run prepare",
+						"([ $COMPOSER_DEV_MODE -eq 1 ] && composer autocomplete) || true"
+				],
         "clear": "@php vendor/bin/testbench package:purge-bluesky-notification-channel --ansi",
         "prepare": "@php vendor/bin/testbench package:discover --ansi",
         "build": [
@@ -57,10 +58,9 @@
             "@composer run build",
             "@php vendor/bin/testbench serve"
         ],
-        "analyse": "vendor/bin/phpstan analyse",
         "test": "vendor/bin/pest",
-        "test-coverage": "vendor/bin/pest --coverage",
-        "format": "vendor/bin/pint"
+				"lint": "php-cs-fixer fix --allow-risky=yes --dry-run",
+				"lint:fix": "php-cs-fixer fix --allow-risky=yes"
     },
     "config": {
         "sort-packages": true,
@@ -77,22 +77,5 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true,
-    "test": "pest",
-    "lint": "php-cs-fixer fix --allow-risky=yes --dry-run",
-    "lint:fix": "php-cs-fixer fix --allow-risky=yes",
-    "post-update-cmd": "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-    "post-root-package-install": "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
-    "post-create-project-cmd": "@php artisan key:generate --ansi",
-    "post-autoload-dump": [
-        "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-        "@php artisan package:discover --ansi",
-        "([ $COMPOSER_DEV_MODE -eq 1 ] && composer autocomplete) || true"
-    ],
-    "autocomplete": [
-        "@php artisan ide-helper:eloquent || true",
-        "@php artisan ide-helper:generate || true",
-        "@php artisan ide-helper:meta || true",
-        "@php artisan ide-helper:models -M || true"
-    ]
+    "prefer-stable": true
 }
