@@ -1,8 +1,8 @@
 <h2 align="center">Bluesky notification channel for Laravel</h2>
 
 <p align="center">
-  <a href="https://github.com/innocenzi/bluesky-notification-channel/actions?query=workflow%3Aci">
-    <img alt="Status" src="https://github.com/innocenzi/bluesky-notification-channel/actions/workflows/ci.yml/badge.svg">
+  <a href="https://github.com/innocenzi/bluesky-notification-channel/actions?query=workflow%3Arun-tests">
+    <img alt="Status" src="https://github.com/innocenzi/bluesky-notification-channel/actions/workflows/run-tests.yml/badge.svg">
   </a>
   <span>&nbsp;</span>
   <a href="https://packagist.org/packages/innocenzi/bluesky-notification-channel">
