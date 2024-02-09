@@ -1,5 +1,5 @@
 <?php
 
-use Innocenzi\BlueskyNotificationChannel\Tests\TestCase;
+use NotificationChannels\Bluesky\Tests\TestCase;
 
 uses(TestCase::class)->in(__DIR__);

@@ -9,3 +9,7 @@ phpstan.neon
 testbench.yaml
 vendor
 node_modules
+.env
+.php-cs-fixer.cache
+_ide_helper*
+.phpstorm.meta.php

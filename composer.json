@@ -21,6 +21,9 @@
         "illuminate/contracts": "^10.0"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^2.14",
+        "friendsofphp/php-cs-fixer": "^3.49",
+        "guzzlehttp/guzzle": "^7.8",
         "laravel/pint": "^1.0",
         "nunomaduro/collision": "^7.8",
         "orchestra/testbench": "^8.8",
@@ -31,13 +34,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Innocenzi\\BlueskyNotificationChannel\\": "src/",
-            "Innocenzi\\BlueskyNotificationChannel\\Database\\Factories\\": "database/factories/"
+            "NotificationChannels\\Bluesky\\": "src/",
+            "NotificationChannels\\Bluesky\\Database\\Factories\\": "database/factories/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Innocenzi\\BlueskyNotificationChannel\\Tests\\": "tests/",
+            "NotificationChannels\\Bluesky\\Tests\\": "tests/",
             "Workbench\\App\\": "workbench/app/"
         }
     },
@@ -69,13 +72,27 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Innocenzi\\BlueskyNotificationChannel\\BlueskyNotificationChannelServiceProvider"
-            ],
-            "aliases": {
-                "BlueskyNotificationChannel": "Innocenzi\\BlueskyNotificationChannel\\Facades\\BlueskyNotificationChannel"
-            }
+                "NotificationChannels\\Bluesky\\BlueskyServiceProvider"
+            ]
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "test": "pest",
+    "lint": "php-cs-fixer fix --allow-risky=yes --dry-run",
+    "lint:fix": "php-cs-fixer fix --allow-risky=yes",
+    "post-update-cmd": "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+    "post-root-package-install": "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+    "post-create-project-cmd": "@php artisan key:generate --ansi",
+    "post-autoload-dump": [
+        "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+        "@php artisan package:discover --ansi",
+        "([ $COMPOSER_DEV_MODE -eq 1 ] && composer autocomplete) || true"
+    ],
+    "autocomplete": [
+        "@php artisan ide-helper:eloquent || true",
+        "@php artisan ide-helper:generate || true",
+        "@php artisan ide-helper:meta || true",
+        "@php artisan ide-helper:models -M || true"
+    ]
 }

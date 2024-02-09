@@ -1,36 +1,35 @@
 <?php
 
-namespace Innocenzi\BlueskyNotificationChannel\Tests;
+namespace NotificationChannels\Bluesky\Tests;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Config\Repository;
+use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Http;
+use NotificationChannels\Bluesky\BlueskyServiceProvider;
 use Orchestra\Testbench\TestCase as Orchestra;
-use Innocenzi\BlueskyNotificationChannel\BlueskyNotificationChannelServiceProvider;
 
 class TestCase extends Orchestra
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        Factory::guessFactoryNamesUsing(
-            fn (string $modelName) => 'Innocenzi\\BlueskyNotificationChannel\\Database\\Factories\\'.class_basename($modelName).'Factory'
-        );
-    }
-
-    protected function getPackageProviders($app)
+    protected function getPackageProviders($app): array
     {
         return [
-            BlueskyNotificationChannelServiceProvider::class,
+            BlueskyServiceProvider::class,
         ];
     }
 
-    public function getEnvironmentSetUp($app)
+    protected function defineEnvironment($app): void
     {
-        config()->set('database.default', 'testing');
+        Http::preventStrayRequests();
 
-        /*
-        $migration = include __DIR__.'/../database/migrations/create_bluesky-notification-channel_table.php.stub';
-        $migration->up();
-        */
+        /** @var Repository */
+        $config = $app->make(Repository::class);
+        $config->set('services.bluesky.username', 'bsky-username'); // env('BLUESKY_USERNAME')
+        $config->set('services.bluesky.password', 'bsky-password'); // env('BLUESKY_PASSWORD')
+    }
+
+    protected function resolveApplication(): Application
+    {
+        return (new Application($this->getBasePath()))
+            ->useEnvironmentPath(__DIR__ . '/..');
     }
 }
