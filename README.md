@@ -22,16 +22,14 @@
 
 ### Configure your account's credentials
 
-To interact with its API, Bluesky recommends creation an application-specific password instead of using your account's main password.
-
-You may create one in your [account settings](https://bsky.app/settings/app-passwords). Once created, fill your `.env` accordingly:
+To interact with its API, Bluesky recommends creating an application-specific password instead of using your account's main password. You may create one in your [account settings](https://bsky.app/settings/app-passwords). Once created, fill your `.env` accordingly:
 
 ```env
 BLUESKY_USERNAME=your-handle
 BLUESKY_PASSWORD=your-app-password
 ```
 
-Add add these values to `config/services.php`:
+Add these values to `config/services.php`:
 
 ```php
 return [
@@ -45,7 +43,7 @@ return [
 
 ### Creating posts
 
-To create a post, you will need to create a [new notification](https://laravel.com/docs/master/notifications#generating-notifications) and configure the `BlueskyChannel` channel:
+To create a post, you will need to configure the `BlueskyChannel` channel in a [notification](https://laravel.com/docs/master/notifications#generating-notifications):
 
 ```php
 final class CreateBlueskyPost extends Notification
