@@ -27,9 +27,9 @@ class TestCase extends Orchestra
         $config->set('services.bluesky.password', 'bsky-password'); // env('BLUESKY_PASSWORD')
     }
 
-    protected function resolveApplication(): Application
-    {
-        return (new Application($this->getBasePath()))
-            ->useEnvironmentPath(__DIR__ . '/..');
-    }
+    // protected function resolveApplication(): Application
+    // {
+    //     return (new Application($this->getBasePath()))
+    //         ->useEnvironmentPath(__DIR__ . '/..');
+    // }
 }
