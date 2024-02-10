@@ -72,8 +72,7 @@ final class BlueskyClientResponseFactory
         }
     }
 
-    /** @deprecated */
-    public static function create(array $data = []): BlueskyIdentity
+    public static function createIdentity(array $data = []): BlueskyIdentity
     {
         return new BlueskyIdentity(...[
             ...Arr::except(self::$fakeCreateSessionResponse, 'emailConfirmed'),
