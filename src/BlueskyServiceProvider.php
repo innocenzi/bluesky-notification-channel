@@ -22,6 +22,7 @@ final class BlueskyServiceProvider extends PackageServiceProvider
     {
         $this->app->singleton(IdentityRepository::class, fn () => new IdentityRepositoryUsingCache(
             cache: $this->app->make(Cache::class),
+            key: $this->app->make(Config::class)->get('services.bluesky.identity_cache_key', default: IdentityRepositoryUsingCache::DEFAULT_CACHE_KEY),
         ));
 
         $this->app->singleton(BlueskyClient::class, fn () => new BlueskyClient(

@@ -8,21 +8,22 @@ use NotificationChannels\Bluesky\Exceptions\NoBlueskyIdentityFound;
 
 class IdentityRepositoryUsingCache implements IdentityRepository
 {
-    public const CACHE_KEY = 'bluesky-notification-channel:identity';
+    public const DEFAULT_CACHE_KEY = 'bluesky-notification-channel:identity';
 
     public function __construct(
         private readonly CacheRepository $cache,
+        private readonly string $key,
     ) {
     }
 
     public function clearIdentity(): void
     {
-        $this->cache->forget(static::CACHE_KEY);
+        $this->cache->forget($this->key);
     }
 
     public function hasIdentity(): bool
     {
-        return $this->cache->get(static::CACHE_KEY) instanceof BlueskyIdentity;
+        return $this->cache->get($this->key) instanceof BlueskyIdentity;
     }
 
     public function getIdentity(): BlueskyIdentity
@@ -31,13 +32,13 @@ class IdentityRepositoryUsingCache implements IdentityRepository
             throw NoBlueskyIdentityFound::create();
         }
 
-        return $this->cache->get(static::CACHE_KEY);
+        return $this->cache->get($this->key);
     }
 
     public function setIdentity(BlueskyIdentity $identity): void
     {
         $this->cache->set(
-            key: static::CACHE_KEY,
+            key: $this->key,
             value: $identity,
         );
     }
