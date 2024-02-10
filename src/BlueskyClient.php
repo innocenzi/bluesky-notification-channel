@@ -8,6 +8,7 @@ use NotificationChannels\Bluesky\Exceptions\CouldNotCreatePost;
 use NotificationChannels\Bluesky\Exceptions\CouldNotCreateSession;
 use NotificationChannels\Bluesky\Exceptions\CouldNotRefreshSession;
 use NotificationChannels\Bluesky\Exceptions\CouldNotResolveHandle;
+use NotificationChannels\Bluesky\RichText\Facets\Facet;
 
 final class BlueskyClient
 {
@@ -90,7 +91,9 @@ final class BlueskyClient
                 'collection' => 'app.bsky.feed.post',
                 'record' => [
                     'createdAt' => now()->toIso8601ZuluString(),
-                    ...$post->resolveFacets($this)->toArray(),
+                    ...$post
+                        ->facets(facets: Facet::resolveFacets($post->text, $this))
+                        ->toArray(),
                 ],
             ]);
 

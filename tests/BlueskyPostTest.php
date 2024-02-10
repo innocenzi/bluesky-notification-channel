@@ -1,42 +1,21 @@
 <?php
 
-use NotificationChannels\Bluesky\BlueskyClient;
 use NotificationChannels\Bluesky\BlueskyPost;
-use NotificationChannels\Bluesky\Tests\Factories\BlueskyClientResponseFactory;
+use NotificationChannels\Bluesky\RichText\Facets\Facet;
+use NotificationChannels\Bluesky\RichText\Facets\Features\Mention;
 
 it('can be converted to an array', function () {
-    $post = BlueskyPost::make()->text('foo');
+    $post = BlueskyPost::make()
+        ->text('foo')
+        ->facet(new Facet(
+            range: [6, 20],
+            features: [
+                new Mention('did:plc:sa57ykejomjswkuoktilt3sz'),
+            ],
+        ));
 
     expect($post->toArray())->toBe([
         'text' => 'foo',
-        'facets' => [],
-    ]);
-});
-
-it('has an accessble `text` property', function () {
-    $post = BlueskyPost::make()->text('foo');
-
-    expect($post->text)->toBe('foo');
-});
-
-it('has an accessble `facets` property', function () {
-    $post = BlueskyPost::make()->text('foo');
-
-    expect($post->facets)->toBe([]);
-});
-
-it('can generate facets given the `BlueskyClient` instance', function () {
-    ray()->showHttpClientRequests();
-    BlueskyClientResponseFactory::fake();
-
-    $client = resolve(BlueskyClient::class);
-
-    $post = BlueskyPost::make()
-        ->text('Hello @innocenzi.dev')
-        ->resolveFacets($client);
-
-    expect($post->toArray())->toBe([
-        'text' => 'Hello @innocenzi.dev',
         'facets' => [
             [
                 '$type' => 'app.bsky.richtext.facet',
@@ -53,4 +32,16 @@ it('can generate facets given the `BlueskyClient` instance', function () {
             ],
         ],
     ]);
+});
+
+it('has an accessble `text` property', function () {
+    $post = BlueskyPost::make()->text('foo');
+
+    expect($post->text)->toBe('foo');
+});
+
+it('has an accessble `facets` property', function () {
+    $post = BlueskyPost::make()->text('foo');
+
+    expect($post->facets)->toBe([]);
 });

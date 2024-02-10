@@ -8,7 +8,7 @@ class BlueskyPost
 {
     private function __construct(
         public string $text = '',
-        public readonly array $facets = [],
+        public array $facets = [],
     ) {
     }
 
@@ -28,12 +28,26 @@ class BlueskyPost
         return new static();
     }
 
-    public function resolveFacets(BlueskyClient $client): static
+    /**
+     * Adds a facet to the post. Note that most facets are resolved automatically.
+     */
+    public function facet(Facet $facet): static
     {
-        return new static(
-            text: $this->text,
-            facets: Facet::resolveFacets($this->text, $client),
-        );
+        $this->facets[] = $facet;
+
+        return $this;
+    }
+
+    /**
+     * Adds multiple facets to the post. Note that most facets are resolved automatically.
+     *
+     * @param Facet[] $facet
+     */
+    public function facets(array $facets): static
+    {
+        $this->facets = array_merge($this->facets, $facets);
+
+        return $this;
     }
 
     /**
