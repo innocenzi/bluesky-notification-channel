@@ -23,8 +23,8 @@ class TestCase extends Orchestra
 
         /** @var Repository */
         $config = $app->make(Repository::class);
-        $config->set('services.bluesky.username', 'bsky-username'); // env('BLUESKY_USERNAME')
-        $config->set('services.bluesky.password', 'bsky-password'); // env('BLUESKY_PASSWORD')
+        $config->set('services.bluesky.username', env('BLUESKY_USERNAME', 'bsky-username'));
+        $config->set('services.bluesky.password', env('BLUESKY_PASSWORD', 'bsky-password'));
     }
 
     // protected function resolveApplication(): Application
