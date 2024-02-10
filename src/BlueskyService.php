@@ -17,7 +17,7 @@ final class BlueskyService
     {
         return $this->client->createPost(
             identity: $this->sessionManager->getIdentity(),
-            text: $text,
+            post: $text,
         );
     }
 }

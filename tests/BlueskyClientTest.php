@@ -4,6 +4,7 @@ use NotificationChannels\Bluesky\BlueskyClient;
 use NotificationChannels\Bluesky\Exceptions\CouldNotCreatePost;
 use NotificationChannels\Bluesky\Exceptions\CouldNotCreateSession;
 use NotificationChannels\Bluesky\Exceptions\CouldNotRefreshSession;
+use NotificationChannels\Bluesky\Exceptions\CouldNotResolveHandle;
 use NotificationChannels\Bluesky\Tests\Factories\BlueskyClientResponseFactory;
 
 describe('createIdentity', function () {
@@ -109,7 +110,7 @@ describe('createPost', function () {
         $service = resolve(BlueskyClient::class);
         $service->createPost(
             identity: $service->createIdentity(),
-            text: 'Hello, world!',
+            post: 'Hello, world!',
         );
     })->throws(CouldNotCreatePost::class, 'Token is expired (400, ExpiredToken)');
 });
@@ -143,4 +144,32 @@ describe('refreshIdentity', function () {
             identity: $service->createIdentity(),
         );
     })->throws(CouldNotRefreshSession::class, 'Token is expired (400, ExpiredToken)');
+});
+
+describe('resolveHandle', function () {
+    it('can resolve a handle to a did', function () {
+        BlueskyClientResponseFactory::fake([
+            BlueskyClient::RESOLVE_HANDLE_ENDPOINT => ['did' => 'did:example:123'],
+        ]);
+
+        /** @var BlueskyClient */
+        $service = resolve(BlueskyClient::class);
+        $response = $service->resolveHandle(handle: 'uwu');
+
+        expect($response)->toBe('did:example:123');
+    });
+
+    it('throws when the refresh token is expired', function () {
+        BlueskyClientResponseFactory::fake([
+            BlueskyClient::RESOLVE_HANDLE_ENDPOINT => [
+                ':status' => 400,
+                'error' => 'ExpiredToken',
+                'message' => null,
+            ],
+        ]);
+
+        /** @var BlueskyClient */
+        $service = resolve(BlueskyClient::class);
+        $service->resolveHandle(handle: 'uwu');
+    })->throws(CouldNotResolveHandle::class, 'Token is expired (400, ExpiredToken)');
 });

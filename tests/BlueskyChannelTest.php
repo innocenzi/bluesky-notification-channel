@@ -7,9 +7,10 @@ use NotificationChannels\Bluesky\Exceptions\NoBlueskyChannel;
 use NotificationChannels\Bluesky\Tests\Factories\BlueskyClientResponseFactory;
 use NotificationChannels\Bluesky\Tests\Fixtures\TestNotifiable;
 use NotificationChannels\Bluesky\Tests\Fixtures\TestNotification;
+use NotificationChannels\Bluesky\Tests\Fixtures\TestNotificationWithMention;
 use NotificationChannels\Bluesky\Tests\Fixtures\TestNotificationWithoutChannel;
 
-test('notifications can be sent', function () {
+test('posts can be created', function () {
     BlueskyClientResponseFactory::fake([
         BlueskyClient::CREATE_RECORD_ENDPOINT => ['uri' => 'foo'],
     ]);
@@ -21,6 +22,20 @@ test('notifications can be sent', function () {
     $response = $channel->send(new TestNotifiable(), new TestNotification());
 
     expect($response)->toBe('foo');
+});
+
+test('posts with mentions can be created', function () {
+    BlueskyClientResponseFactory::fake([
+        BlueskyClient::CREATE_RECORD_ENDPOINT => ['uri' => 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3jt6walwmos2y'],
+    ]);
+
+    /** @var BlueskyService */
+    $service = resolve(BlueskyService::class);
+
+    $channel = new BlueskyChannel($service);
+    $response = $channel->send(new TestNotifiable(), new TestNotificationWithMention());
+
+    expect($response)->toBe('at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3jt6walwmos2y');
 });
 
 test('an exception is thrown if the notification does not have a `toBluesky` method', function () {

@@ -7,6 +7,7 @@ use Illuminate\Http\Client\Response;
 use NotificationChannels\Bluesky\Exceptions\CouldNotCreatePost;
 use NotificationChannels\Bluesky\Exceptions\CouldNotCreateSession;
 use NotificationChannels\Bluesky\Exceptions\CouldNotRefreshSession;
+use NotificationChannels\Bluesky\Exceptions\CouldNotResolveHandle;
 
 final class BlueskyClient
 {
@@ -14,6 +15,7 @@ final class BlueskyClient
     public const REFRESH_SESSION_ENDPOINT = 'com.atproto.server.refreshSession';
     public const CREATE_SESSION_ENDPOINT = 'com.atproto.server.createSession';
     public const CREATE_RECORD_ENDPOINT = 'com.atproto.repo.createRecord';
+    public const RESOLVE_HANDLE_ENDPOINT = 'com.atproto.identity.resolveHandle';
 
     public function __construct(
         protected readonly HttpClient $httpClient,
@@ -21,6 +23,19 @@ final class BlueskyClient
         protected readonly string $username,
         protected readonly string $password,
     ) {
+    }
+
+    public function resolveHandle(string $handle): string
+    {
+        $response = $this->httpClient
+            ->asJson()
+            ->get("{$this->baseUrl}/" . self::RESOLVE_HANDLE_ENDPOINT, [
+                'handle' => $handle,
+            ]);
+
+        $this->ensureResponseSucceeded($response, CouldNotResolveHandle::class);
+
+        return $response->json('did');
     }
 
     public function createIdentity(): BlueskyIdentity
@@ -46,8 +61,8 @@ final class BlueskyClient
     public function refreshIdentity(BlueskyIdentity $identity): BlueskyIdentity
     {
         $response = $this->httpClient
-            ->withHeader('Authorization', "Bearer {$identity->refreshJwt}")
             ->asForm()
+            ->withHeader('Authorization', "Bearer {$identity->refreshJwt}")
             ->post("{$this->baseUrl}/" . self::REFRESH_SESSION_ENDPOINT);
 
         $this->ensureResponseSucceeded($response, CouldNotRefreshSession::class);
@@ -61,8 +76,12 @@ final class BlueskyClient
         );
     }
 
-    public function createPost(BlueskyIdentity $identity, BlueskyPost|string $text): string
+    public function createPost(BlueskyIdentity $identity, BlueskyPost|string $post): string
     {
+        if (\is_string($post)) {
+            $post = BlueskyPost::make()->text($post);
+        }
+
         $response = $this->httpClient
             ->asJson()
             ->withHeader('Authorization', "Bearer {$identity->accessJwt}")
@@ -70,8 +89,8 @@ final class BlueskyClient
                 'repo' => $identity->handle,
                 'collection' => 'app.bsky.feed.post',
                 'record' => [
-                    'text' => (string) $text,
                     'createdAt' => now()->toIso8601ZuluString(),
+                    ...$post->resolveFacets($this)->toArray(),
                 ],
             ]);
 

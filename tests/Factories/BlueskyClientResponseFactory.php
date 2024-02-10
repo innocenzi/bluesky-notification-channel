@@ -30,6 +30,10 @@ final class BlueskyClientResponseFactory
         'didDoc' => [],
     ];
 
+    private static array $fakeResolveHandleResponse = [
+        'did' => 'did:plc:sa57ykejomjswkuoktilt3sz',
+    ];
+
     private static array $fakeCreatePostResponse = [
         'uri' => 'at://did:plc:sa57ykejomjswkuoktilt3sz/app.bsky.feed.post/3kkxqb634qt2e',
         'cid' => 'bafyreidbmavpfhe7d7e7levliaeprqyknh6pwyauw6qavtubfyetnzug7y', // hash of the text
@@ -37,12 +41,15 @@ final class BlueskyClientResponseFactory
 
     public static function assertSent(array $expected): void
     {
-        // TODO
+        // TODO: must check that somewhere in $sentRequests, the properties and values of $expected are included
+        // order doesn't matter, and missing properties of $expected don't matter either
         test()->markTestIncomplete('Assertion not implemented');
     }
 
     public static function fake(array $endpoints = []): void
     {
+        static::$sentRequests = [];
+
         Event::listen(RequestSending::class, function (RequestSending $event) {
             static::$sentRequests[] = json_decode($event->request->body(), associative: true);
         });
@@ -50,6 +57,7 @@ final class BlueskyClientResponseFactory
         $endpoints[BlueskyClient::CREATE_SESSION_ENDPOINT] ??= [];
         $endpoints[BlueskyClient::REFRESH_SESSION_ENDPOINT] ??= [];
         $endpoints[BlueskyClient::CREATE_RECORD_ENDPOINT] ??= [];
+        $endpoints[BlueskyClient::RESOLVE_HANDLE_ENDPOINT] ??= [];
 
         foreach ($endpoints as $endpoint => $data) {
             if (is_numeric($endpoint)) {
@@ -62,12 +70,13 @@ final class BlueskyClientResponseFactory
                     BlueskyClient::CREATE_SESSION_ENDPOINT => self::fakeCreateSessionResponse($data ?? []),
                     BlueskyClient::CREATE_RECORD_ENDPOINT => self::fakeCreatePostResponse($data ?? []),
                     BlueskyClient::REFRESH_SESSION_ENDPOINT => self::fakeRefreshSessionResponse($data ?? []),
+                    BlueskyClient::RESOLVE_HANDLE_ENDPOINT => self::fakeResolveHandleResponse($data ?? []),
                 },
                 status: $status,
             );
 
             Http::fake([
-                '*' . $endpoint => $data,
+                '*' . explode('?', $endpoint)[0] . '*' => $data,
             ]);
         }
     }
@@ -78,6 +87,14 @@ final class BlueskyClientResponseFactory
             ...Arr::except(self::$fakeCreateSessionResponse, 'emailConfirmed'),
             ...$data,
         ]);
+    }
+
+    public static function fakeResolveHandleResponse(array $data = []): array
+    {
+        return [
+            ...self::$fakeResolveHandleResponse,
+            ...$data,
+        ];
     }
 
     public static function fakeCreatePostResponse(array $data = []): array
