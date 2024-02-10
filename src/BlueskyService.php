@@ -3,7 +3,6 @@
 namespace NotificationChannels\Bluesky;
 
 use NotificationChannels\Bluesky\IdentityRepository\IdentityRepository;
-use NotificationChannels\Bluesky\SessionManager\SessionManager;
 
 final class BlueskyService
 {

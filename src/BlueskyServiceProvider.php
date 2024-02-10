@@ -7,7 +7,6 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Http\Client\Factory as HttpClient;
 use NotificationChannels\Bluesky\IdentityRepository\IdentityRepository;
 use NotificationChannels\Bluesky\IdentityRepository\IdentityRepositoryUsingCache;
-use NotificationChannels\Bluesky\SessionManager\SessionManager;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 

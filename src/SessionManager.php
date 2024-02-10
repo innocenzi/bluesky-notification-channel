@@ -1,9 +1,7 @@
 <?php
 
-namespace NotificationChannels\Bluesky\SessionManager;
+namespace NotificationChannels\Bluesky;
 
-use NotificationChannels\Bluesky\BlueskyClient;
-use NotificationChannels\Bluesky\BlueskyIdentity;
 use NotificationChannels\Bluesky\IdentityRepository\IdentityRepository;
 
 /**
