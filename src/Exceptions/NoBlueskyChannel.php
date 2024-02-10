@@ -2,7 +2,7 @@
 
 namespace NotificationChannels\Bluesky\Exceptions;
 
-final class NoBlueskyChannel extends \Exception
+final class NoBlueskyChannel extends BlueskyException
 {
     public static function create(string $class): self
     {

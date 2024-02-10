@@ -3,7 +3,7 @@
 namespace NotificationChannels\Bluesky\RichText\Facets;
 
 use NotificationChannels\Bluesky\BlueskyClient;
-use NotificationChannels\Bluesky\Exceptions\BlueskyException;
+use NotificationChannels\Bluesky\Exceptions\BlueskyClientException;
 use NotificationChannels\Bluesky\RichText\Facets\Features\Link;
 use NotificationChannels\Bluesky\RichText\Facets\Features\Mention;
 
@@ -52,7 +52,7 @@ final class Facet
 
             try {
                 $did = $client->resolveHandle($handle);
-            } catch (BlueskyException) {
+            } catch (BlueskyClientException) {
                 return null;
             }
 

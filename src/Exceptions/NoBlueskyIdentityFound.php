@@ -2,7 +2,7 @@
 
 namespace NotificationChannels\Bluesky\Exceptions;
 
-final class NoBlueskyIdentityFound extends \Exception
+final class NoBlueskyIdentityFound extends BlueskyException
 {
     public static function create(): self
     {

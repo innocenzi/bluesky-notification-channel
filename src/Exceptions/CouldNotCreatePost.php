@@ -2,7 +2,7 @@
 
 namespace NotificationChannels\Bluesky\Exceptions;
 
-final class CouldNotCreatePost extends BlueskyException
+final class CouldNotCreatePost extends BlueskyClientException
 {
     protected static function getDefaultMessage(): string
     {

@@ -2,7 +2,7 @@
 
 namespace NotificationChannels\Bluesky\Exceptions;
 
-final class CouldNotRefreshSession extends BlueskyException
+final class CouldNotRefreshSession extends BlueskyClientException
 {
     protected static function getDefaultMessage(): string
     {
