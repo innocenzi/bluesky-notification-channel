@@ -7,6 +7,7 @@ use NotificationChannels\Bluesky\RichText\Facets\Features\Mention;
 it('can be converted to an array', function () {
     $post = BlueskyPost::make()
         ->text('foo')
+        ->language(['en-US'])
         ->facet(new Facet(
             range: [6, 20],
             features: [
@@ -31,6 +32,7 @@ it('can be converted to an array', function () {
                 ],
             ],
         ],
+        'langs' => ['en-US'],
     ]);
 });
 

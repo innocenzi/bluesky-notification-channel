@@ -2,6 +2,7 @@
 
 namespace NotificationChannels\Bluesky;
 
+use Illuminate\Support\Arr;
 use NotificationChannels\Bluesky\RichText\Facets\Facet;
 
 class BlueskyPost
@@ -9,23 +10,37 @@ class BlueskyPost
     private function __construct(
         public string $text = '',
         public array $facets = [],
+        public array $languages = [],
     ) {
     }
 
     public function toArray(): array
     {
-        return [
+        return array_filter([
             'text' => $this->text,
             'facets' => array_map(
                 callback: fn (array|Facet $facet) => \is_array($facet) ? $facet : $facet->toArray(),
                 array: $this->facets,
             ),
-        ];
+            'langs' => $this->languages,
+        ]);
     }
 
     public static function make(): static
     {
         return new static();
+    }
+
+    /**
+     * Sets the language(s) of the post.
+     *
+     * @see https://www.docs.bsky.app/blog/create-post#setting-the-posts-language
+     */
+    public function language(string|array $language): static
+    {
+        $this->languages = Arr::wrap($language);
+
+        return $this;
     }
 
     /**
