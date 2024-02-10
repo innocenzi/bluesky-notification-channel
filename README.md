@@ -66,6 +66,16 @@ final class CreateBlueskyPost extends Notification
 }
 ```
 
+You may then dispatch the notification:
+
+```php
+// Without a notifiable
+(new AnonymousNotifiable())->notify(new CreateBlueskyPost);
+
+// With a notifiable
+$post->notify(new CreateBlueskyPost);
+```
+
 
 &nbsp;
 
