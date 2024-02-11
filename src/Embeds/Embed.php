@@ -1,10 +1,10 @@
 <?php
 
-namespace NotificationChannels\Bluesky\RichText\Facets;
+namespace NotificationChannels\Bluesky\Embeds;
 
 use NotificationChannels\Bluesky\RichText\SerializesIntoPost;
 
-abstract class FacetFeature
+abstract class Embed
 {
     use SerializesIntoPost;
 }

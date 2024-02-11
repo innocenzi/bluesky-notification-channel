@@ -11,7 +11,7 @@ final class Mention extends FacetFeature
     ) {
     }
 
-    protected function getType(): string
+    public function getType(): string
     {
         return 'app.bsky.richtext.facet#mention';
     }

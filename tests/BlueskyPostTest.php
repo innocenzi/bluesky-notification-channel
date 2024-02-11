@@ -1,6 +1,7 @@
 <?php
 
 use NotificationChannels\Bluesky\BlueskyPost;
+use NotificationChannels\Bluesky\Embeds\External;
 use NotificationChannels\Bluesky\RichText\Facets\Facet;
 use NotificationChannels\Bluesky\RichText\Facets\Features\Mention;
 
@@ -8,6 +9,19 @@ it('can be converted to an array', function () {
     $post = BlueskyPost::make()
         ->text('foo')
         ->language(['en-US'])
+        ->embed(new External(
+            uri: 'https://innocenzi.dev',
+            title: 'Enzo Innocenzi - Software developer',
+            description: 'I am too lazy',
+            thumb: [
+                '$type' => 'blob',
+                'ref' => [
+                    '$link' => 'bafkreiash5eihfku2jg4skhyh5kes7j5d5fd6xxloaytdywcvb3r3zrzhu',
+                ],
+                'mimeType' => 'image/png',
+                'size' => 23527,
+            ],
+        ))
         ->facet(new Facet(
             range: [6, 20],
             features: [
@@ -29,6 +43,22 @@ it('can be converted to an array', function () {
                         '$type' => 'app.bsky.richtext.facet#mention',
                         'did' => 'did:plc:sa57ykejomjswkuoktilt3sz',
                     ],
+                ],
+            ],
+        ],
+        'embed' => [
+            '$type' => 'app.bsky.embed.external',
+            'external' => [
+                'uri' => 'https://innocenzi.dev',
+                'title' => 'Enzo Innocenzi - Software developer',
+                'description' => 'I am too lazy',
+                'thumb' => [
+                    '$type' => 'blob',
+                    'ref' => [
+                        '$link' => 'bafkreiash5eihfku2jg4skhyh5kes7j5d5fd6xxloaytdywcvb3r3zrzhu',
+                    ],
+                    'mimeType' => 'image/png',
+                    'size' => 23527,
                 ],
             ],
         ],

@@ -16,6 +16,14 @@ final class Facet
         // TODO: validation and exceptions
     }
 
+    /**
+     * Gets the features for this facet.
+     */
+    public function getFeatures(): array
+    {
+        return $this->features;
+    }
+
     public function toArray(): array
     {
         return [

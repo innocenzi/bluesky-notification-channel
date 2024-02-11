@@ -4,11 +4,13 @@ namespace NotificationChannels\Bluesky;
 
 use Illuminate\Http\Client\Factory as HttpClient;
 use Illuminate\Http\Client\Response;
+use NotificationChannels\Bluesky\Embeds\EmbedResolver;
 use NotificationChannels\Bluesky\Exceptions\CouldNotCreatePost;
 use NotificationChannels\Bluesky\Exceptions\CouldNotCreateSession;
 use NotificationChannels\Bluesky\Exceptions\CouldNotRefreshSession;
 use NotificationChannels\Bluesky\Exceptions\CouldNotResolveHandle;
-use NotificationChannels\Bluesky\RichText\Facets\Facet;
+use NotificationChannels\Bluesky\Exceptions\CouldNotUploadBlob;
+use ValueError;
 
 final class BlueskyClient
 {
@@ -16,10 +18,12 @@ final class BlueskyClient
     public const REFRESH_SESSION_ENDPOINT = 'com.atproto.server.refreshSession';
     public const CREATE_SESSION_ENDPOINT = 'com.atproto.server.createSession';
     public const CREATE_RECORD_ENDPOINT = 'com.atproto.repo.createRecord';
+    public const UPLOAD_BLOB_ENDPOINT = 'com.atproto.repo.uploadBlob';
     public const RESOLVE_HANDLE_ENDPOINT = 'com.atproto.identity.resolveHandle';
 
     public function __construct(
         protected readonly HttpClient $httpClient,
+        protected readonly EmbedResolver $embedResolver,
         protected readonly string $baseUrl,
         protected readonly string $username,
         protected readonly string $password,
@@ -77,12 +81,8 @@ final class BlueskyClient
         );
     }
 
-    public function createPost(BlueskyIdentity $identity, BlueskyPost|string $post): string
+    public function createPost(BlueskyIdentity $identity, BlueskyPost $post): string
     {
-        if (\is_string($post)) {
-            $post = BlueskyPost::make()->text($post);
-        }
-
         $response = $this->httpClient
             ->asJson()
             ->withHeader('Authorization', "Bearer {$identity->accessJwt}")
@@ -91,15 +91,45 @@ final class BlueskyClient
                 'collection' => 'app.bsky.feed.post',
                 'record' => [
                     'createdAt' => now()->toIso8601ZuluString(),
-                    ...$post
-                        ->facets(facets: Facet::resolveFacets($post->text, $this))
-                        ->toArray(),
+                    ...$post->toArray(),
                 ],
             ]);
 
         $this->ensureResponseSucceeded($response, CouldNotCreatePost::class);
 
         return $response->json('uri');
+    }
+
+    public function uploadBlob(BlueskyIdentity $identity, string $pathOrUrl): Blob
+    {
+        $content = null;
+
+        try {
+            $content = @file_get_contents($pathOrUrl);
+        } catch (ValueError) {
+            throw CouldNotUploadBlob::couldNotLoadImage();
+        }
+
+        if ($content === false) {
+            $content = $this->httpClient->get($pathOrUrl)->body();
+        }
+
+        if (!$content) {
+            throw CouldNotUploadBlob::couldNotLoadImage();
+        }
+
+        $response = $this->httpClient
+            ->contentType('image/*')
+            ->withHeader('Authorization', "Bearer {$identity->accessJwt}")
+            ->send('POST', "{$this->baseUrl}/" . self::UPLOAD_BLOB_ENDPOINT, [
+                'body' => $content,
+            ]);
+
+        $this->ensureResponseSucceeded($response, CouldNotUploadBlob::class);
+
+        return new Blob(
+            blob: $response->json('blob'),
+        );
     }
 
     private function ensureResponseSucceeded(Response $response, string $errorClass): void

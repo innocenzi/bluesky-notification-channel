@@ -3,13 +3,25 @@
 namespace NotificationChannels\Bluesky;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Conditionable;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\Traits\Tappable;
+use NotificationChannels\Bluesky\Embeds\Embed;
 use NotificationChannels\Bluesky\RichText\Facets\Facet;
 
 class BlueskyPost
 {
+    use Conditionable;
+    use Macroable;
+    use Tappable;
+
+    private bool $automaticallyResolvesEmbeds = true;
+    private bool $automaticallyResolvesFacets = true;
+
     private function __construct(
         public string $text = '',
         public array $facets = [],
+        public ?Embed $embed = null,
         public array $languages = [],
     ) {
     }
@@ -22,6 +34,7 @@ class BlueskyPost
                 callback: fn (array|Facet $facet) => \is_array($facet) ? $facet : $facet->toArray(),
                 array: $this->facets,
             ),
+            'embed' => $this->embed?->toArray(),
             'langs' => $this->languages,
         ]);
     }
@@ -29,6 +42,53 @@ class BlueskyPost
     public static function make(): static
     {
         return new static();
+    }
+
+    /**
+     * Sets the embed for this post.
+     * Note that by default, supported embeds are resolved automatically.
+     */
+    public function embed(?Embed $embed = null): static
+    {
+        $this->embed = $embed;
+
+        return $this;
+    }
+
+    /**
+     * Disables automatic embed resolution.
+     */
+    public function withoutAutomaticEmbeds(): static
+    {
+        $this->automaticallyResolvesEmbeds = false;
+
+        return $this;
+    }
+
+    /**
+     * Whether automatic embed resolution is enabled.
+     */
+    public function automaticallyResolvesEmbeds(): bool
+    {
+        return $this->automaticallyResolvesEmbeds;
+    }
+
+    /**
+     * Disables automatic facets resolution.
+     */
+    public function withoutAutomaticFacets(): static
+    {
+        $this->automaticallyResolvesFacets = false;
+
+        return $this;
+    }
+
+    /**
+     * Whether automatic facet resolution is enabled.
+     */
+    public function automaticallyResolvesFacets(): bool
+    {
+        return $this->automaticallyResolvesFacets;
     }
 
     /**

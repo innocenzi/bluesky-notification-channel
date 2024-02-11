@@ -11,7 +11,7 @@ final class Link extends FacetFeature
     ) {
     }
 
-    protected function getType(): string
+    public function getType(): string
     {
         return 'app.bsky.richtext.facet#link';
     }

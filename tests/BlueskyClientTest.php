@@ -1,10 +1,12 @@
 <?php
 
 use NotificationChannels\Bluesky\BlueskyClient;
+use NotificationChannels\Bluesky\BlueskyPost;
 use NotificationChannels\Bluesky\Exceptions\CouldNotCreatePost;
 use NotificationChannels\Bluesky\Exceptions\CouldNotCreateSession;
 use NotificationChannels\Bluesky\Exceptions\CouldNotRefreshSession;
 use NotificationChannels\Bluesky\Exceptions\CouldNotResolveHandle;
+use NotificationChannels\Bluesky\Exceptions\CouldNotUploadBlob;
 use NotificationChannels\Bluesky\Tests\Factories\BlueskyClientResponseFactory;
 
 describe('createIdentity', function () {
@@ -14,8 +16,8 @@ describe('createIdentity', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $identity = $service->createIdentity();
+        $client = resolve(BlueskyClient::class);
+        $identity = $client->createIdentity();
 
         expect($identity)->handle->toBe('uwu');
     });
@@ -26,8 +28,8 @@ describe('createIdentity', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $service->createIdentity();
+        $client = resolve(BlueskyClient::class);
+        $client->createIdentity();
     })->throws(CouldNotCreateSession::class, 'Could not create session (401)');
 
     it('throws when the account has been taken down', function () {
@@ -40,8 +42,8 @@ describe('createIdentity', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $service->createIdentity();
+        $client = resolve(BlueskyClient::class);
+        $client->createIdentity();
     })->throws(CouldNotCreateSession::class, 'Account is suspended (400, AccountTakedown)');
 
     it('throws on bad requests', function () {
@@ -50,8 +52,8 @@ describe('createIdentity', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $service->createIdentity();
+        $client = resolve(BlueskyClient::class);
+        $client->createIdentity();
     })->throws(CouldNotCreateSession::class, 'Could not create session (400)');
 
     it('throws when token is expired', function () {
@@ -64,8 +66,8 @@ describe('createIdentity', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $service->createIdentity();
+        $client = resolve(BlueskyClient::class);
+        $client->createIdentity();
     })->throws(CouldNotCreateSession::class, 'Token is expired (400, ExpiredToken)');
 
     it('throws when token is invalid', function () {
@@ -78,8 +80,8 @@ describe('createIdentity', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $service->createIdentity();
+        $client = resolve(BlueskyClient::class);
+        $client->createIdentity();
     })->throws(CouldNotCreateSession::class, 'Token is invalid (400, InvalidToken)');
 });
 
@@ -90,11 +92,36 @@ describe('createPost', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $identity = $service->createIdentity();
-        $response = $service->createPost($identity, 'Hello, world!');
+        $client = resolve(BlueskyClient::class);
+        $identity = $client->createIdentity();
+        $response = $client->createPost(
+            identity: $identity,
+            post: BlueskyPost::make()->text('Hello, world!'),
+        );
 
         expect($response)->toBe('foo');
+    });
+
+    it('can create a post with an embed', function () {
+        BlueskyClientResponseFactory::fake([
+            'https://cardyb.bsky.app/v1/extract*' => [
+                'error' => '',
+                'url' => 'https://innocenzi.dev',
+                'title' => 'Enzo Innocenzi - Software developer',
+                'description' => 'I am too lazy to copy it',
+                'image' => 'https://cardyb.bsky.app/v1/image?url=https%3A%2F%2Finnocenzi.dev%2Fog.jpg',
+            ],
+        ]);
+
+        /** @var BlueskyClient */
+        $client = resolve(BlueskyClient::class);
+        $identity = $client->createIdentity();
+        $response = $client->createPost(
+            identity: $identity,
+            post: BlueskyPost::make()->text('Hello from https://innocenzi.dev'),
+        );
+
+        expect($response)->toBe('at://did:plc:sa57ykejomjswkuoktilt3sz/app.bsky.feed.post/3kkxqb634qt2e');
     });
 
     it('throws when token is expired', function () {
@@ -107,10 +134,10 @@ describe('createPost', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $service->createPost(
-            identity: $service->createIdentity(),
-            post: 'Hello, world!',
+        $client = resolve(BlueskyClient::class);
+        $client->createPost(
+            identity: $client->createIdentity(),
+            post: BlueskyPost::make()->text('Hello, world!'),
         );
     })->throws(CouldNotCreatePost::class, 'Token is expired (400, ExpiredToken)');
 });
@@ -122,9 +149,9 @@ describe('refreshIdentity', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $identity = $service->createIdentity();
-        $response = $service->refreshIdentity($identity);
+        $client = resolve(BlueskyClient::class);
+        $identity = $client->createIdentity();
+        $response = $client->refreshIdentity($identity);
 
         expect($response)->handle->toBe('owo');
     });
@@ -139,9 +166,9 @@ describe('refreshIdentity', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $service->refreshIdentity(
-            identity: $service->createIdentity(),
+        $client = resolve(BlueskyClient::class);
+        $client->refreshIdentity(
+            identity: $client->createIdentity(),
         );
     })->throws(CouldNotRefreshSession::class, 'Token is expired (400, ExpiredToken)');
 });
@@ -153,8 +180,8 @@ describe('resolveHandle', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $response = $service->resolveHandle(handle: 'uwu');
+        $client = resolve(BlueskyClient::class);
+        $response = $client->resolveHandle(handle: 'uwu');
 
         expect($response)->toBe('did:example:123');
     });
@@ -169,7 +196,40 @@ describe('resolveHandle', function () {
         ]);
 
         /** @var BlueskyClient */
-        $service = resolve(BlueskyClient::class);
-        $service->resolveHandle(handle: 'uwu');
+        $client = resolve(BlueskyClient::class);
+        $client->resolveHandle(handle: 'uwu');
     })->throws(CouldNotResolveHandle::class, 'Token is expired (400, ExpiredToken)');
+});
+
+describe('uploadBlob', function () {
+    it('throws when no file is provided', function () {
+        BlueskyClientResponseFactory::fake();
+
+        /** @var BlueskyClient */
+        $client = resolve(BlueskyClient::class);
+        $client->uploadBlob(
+            identity: $client->createIdentity(),
+            pathOrUrl: '',
+        );
+    })->throws(CouldNotUploadBlob::class);
+
+    it('can upload a blob via an external url', function () {
+        BlueskyClientResponseFactory::fake();
+
+        /** @var BlueskyService */
+        $client = resolve(BlueskyClient::class);
+        $response = $client->uploadBlob(
+            identity: $client->createIdentity(),
+            pathOrUrl: 'https://cardyb.bsky.app/v1/image?url=https%3A%2F%2Fwww.docs.bsky.app%2Fimg%2Fsocial-card-default.png',
+        );
+
+        expect($response->blob)->toBe([
+            '$type' => 'blob',
+            'ref' => [
+                '$link' => 'bafkreialypbxslmeod6vvjskyzujexd4ow6huuil354ov66zgqp23hwdlq',
+            ],
+            'mimeType' => 'multipart/form-data',
+            'size' => 17066,
+        ]);
+    });
 });
