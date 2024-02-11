@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use NotificationChannels\Bluesky\BlueskyClient;
 use NotificationChannels\Bluesky\BlueskyIdentity;
+use NotificationChannels\Bluesky\Embeds\LinkEmbedResolverUsingCardyb;
 
-final class BlueskyClientResponseFactory
+final class HttpResponsesFactory
 {
     private static array $sentRequests = [];
 
@@ -39,6 +40,25 @@ final class BlueskyClientResponseFactory
         'cid' => 'bafyreidbmavpfhe7d7e7levliaeprqyknh6pwyauw6qavtubfyetnzug7y', // hash of the text
     ];
 
+    private static array $fakeUploadBlobResponse = [
+        'blob' => [
+            '$type' => 'blob',
+            'ref' => [
+                '$link' => 'bafkreialypbxslmeod6vvjskyzujexd4ow6huuil354ov66zgqp23hwdlq',
+            ],
+            'mimeType' => 'multipart/form-data',
+            'size' => 17066,
+        ],
+    ];
+
+    private static array $fakeCardybResponse = [
+        'error' => '',
+        'url' => 'https://innocenzi.dev',
+        'title' => 'Enzo Innocenzi - Software developer',
+        'description' => 'I am too lazy to copy it',
+        'image' => 'https://cardyb.bsky.app/v1/image?url=https%3A%2F%2Finnocenzi.dev%2Fog.jpg',
+    ];
+
     public static function assertSent(array $expected): void
     {
         // TODO: must check that somewhere in $sentRequests, the properties and values of $expected are included
@@ -58,6 +78,8 @@ final class BlueskyClientResponseFactory
         $endpoints[BlueskyClient::REFRESH_SESSION_ENDPOINT] ??= [];
         $endpoints[BlueskyClient::CREATE_RECORD_ENDPOINT] ??= [];
         $endpoints[BlueskyClient::RESOLVE_HANDLE_ENDPOINT] ??= [];
+        $endpoints[BlueskyClient::UPLOAD_BLOB_ENDPOINT] ??= [];
+        $endpoints[LinkEmbedResolverUsingCardyb::ENDPOINT] ??= [];
 
         foreach ($endpoints as $endpoint => $data) {
             if (is_numeric($endpoint)) {
@@ -71,6 +93,9 @@ final class BlueskyClientResponseFactory
                     BlueskyClient::CREATE_RECORD_ENDPOINT => self::fakeCreatePostResponse($data ?? []),
                     BlueskyClient::REFRESH_SESSION_ENDPOINT => self::fakeRefreshSessionResponse($data ?? []),
                     BlueskyClient::RESOLVE_HANDLE_ENDPOINT => self::fakeResolveHandleResponse($data ?? []),
+                    BlueskyClient::UPLOAD_BLOB_ENDPOINT => self::fakeUploadBlobResponse($data ?? []),
+                    LinkEmbedResolverUsingCardyb::ENDPOINT => self::fakeCardybResponse($data ?? []),
+                    default => $data
                 },
                 status: $status,
             );
@@ -117,6 +142,22 @@ final class BlueskyClientResponseFactory
     {
         return [
             ...self::$fakeRefreshSessionResponse,
+            ...$data,
+        ];
+    }
+
+    public static function fakeUploadBlobResponse(array $data = []): array
+    {
+        return [
+            ...self::$fakeUploadBlobResponse,
+            ...$data,
+        ];
+    }
+
+    public static function fakeCardybResponse(array $data = []): array
+    {
+        return [
+            ...self::$fakeCardybResponse,
             ...$data,
         ];
     }

@@ -1,6 +1,6 @@
 <?php
 
-namespace NotificationChannels\Bluesky\RichText;
+namespace NotificationChannels\Bluesky\Support;
 
 use Attribute;
 

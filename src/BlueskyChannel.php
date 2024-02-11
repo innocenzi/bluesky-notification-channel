@@ -19,7 +19,7 @@ final class BlueskyChannel
         }
 
         return $this->bluesky->createPost(
-            text: $notification->toBluesky($notifiable),
+            post: $notification->toBluesky($notifiable),
         );
     }
 }

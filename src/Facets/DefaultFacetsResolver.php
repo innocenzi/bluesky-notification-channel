@@ -1,41 +1,21 @@
 <?php
 
-namespace NotificationChannels\Bluesky\RichText\Facets;
+namespace NotificationChannels\Bluesky\Facets;
 
 use NotificationChannels\Bluesky\BlueskyClient;
+use NotificationChannels\Bluesky\BlueskyPost;
+use NotificationChannels\Bluesky\BlueskyService;
 use NotificationChannels\Bluesky\Exceptions\BlueskyClientException;
-use NotificationChannels\Bluesky\RichText\Facets\Features\Link;
-use NotificationChannels\Bluesky\RichText\Facets\Features\Mention;
 
-final class Facet
+final class DefaultFacetsResolver implements FacetsResolver
 {
-    public function __construct(
-        private readonly array $range,
-        private readonly array $features,
-    ) {
-        // TODO: validation and exceptions
-    }
-
-    public function toArray(): array
-    {
-        return [
-            '$type' => 'app.bsky.richtext.facet',
-            'index' => [
-                'byteStart' => $this->range[0],
-                'byteEnd' => $this->range[1],
-            ],
-            'features' => array_map(fn (FacetFeature $feature) => $feature->toArray(), $this->features),
-        ];
-    }
-
-    /** @return array<Facet> */
-    public static function resolveFacets(string $text, BlueskyClient $client): array
+    public function resolve(BlueskyService $bluesky, BlueskyPost $post): array
     {
         // https://www.docs.bsky.app/docs/advanced-guides/post-richtext#text-encoding-and-indexing
-        $text = mb_convert_encoding($text, 'utf-8');
+        $text = mb_convert_encoding($post->text, 'utf-8');
 
         return [
-            ...self::detectMentions($text, $client),
+            ...self::detectMentions($text, $bluesky->getClient()),
             ...self::detectLinks($text),
         ];
     }

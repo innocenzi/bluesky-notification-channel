@@ -4,14 +4,14 @@ use NotificationChannels\Bluesky\BlueskyChannel;
 use NotificationChannels\Bluesky\BlueskyClient;
 use NotificationChannels\Bluesky\BlueskyService;
 use NotificationChannels\Bluesky\Exceptions\NoBlueskyChannel;
-use NotificationChannels\Bluesky\Tests\Factories\BlueskyClientResponseFactory;
+use NotificationChannels\Bluesky\Tests\Factories\HttpResponsesFactory;
 use NotificationChannels\Bluesky\Tests\Fixtures\TestNotifiable;
 use NotificationChannels\Bluesky\Tests\Fixtures\TestNotification;
 use NotificationChannels\Bluesky\Tests\Fixtures\TestNotificationWithMention;
 use NotificationChannels\Bluesky\Tests\Fixtures\TestNotificationWithoutChannel;
 
 test('posts can be created', function () {
-    BlueskyClientResponseFactory::fake([
+    HttpResponsesFactory::fake([
         BlueskyClient::CREATE_RECORD_ENDPOINT => ['uri' => 'foo'],
     ]);
 
@@ -25,7 +25,7 @@ test('posts can be created', function () {
 });
 
 test('posts with mentions can be created', function () {
-    BlueskyClientResponseFactory::fake([
+    HttpResponsesFactory::fake([
         BlueskyClient::CREATE_RECORD_ENDPOINT => ['uri' => 'at://did:plc:z72i7hdynmk6r22z27h6tvur/app.bsky.feed.post/3jt6walwmos2y'],
     ]);
 
