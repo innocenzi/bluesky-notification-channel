@@ -85,6 +85,17 @@ Bluesky doesn't provide a way to authenticate requests using classic API tokens.
 
 Since these tokens expire, they cannot be stored in the environment. They are generated dynamically by creating and refreshing sessions and they need to be kept for as long as possible.
 
-This notification channel implementation uses a session manager and an identity repository based on Laravel's cache. This may be overriden by replacing the binding in the container.
+This notification channel implementation uses a session manager and an identity repository based on Laravel's cache. This may be overriden by swapping `NotificationChannels\Bluesky\IdentityRepository\IdentityRepository` in the container.
 
 Additionnally, the key used by the cache-based identity repository may be configured by setting the `services.bluesky.identity_cache_key` option.
+
+
+&nbsp;
+
+## Embeds
+
+For Bluesky, embeds are a client-side responsibility, which means we have to generate website embeds ourselves. 
+
+This notification channel implementation uses Bluesky's own private API, `cardyb.bsky.app`, to fetch a website's metadata, including an URL to its thumbnail. However, that thumbnail stills has to be uploaded to Bluesky as a blob, so a reference to that blob can be added to the post's embed.
+
+You may disable automatic embed generation by calling `withoutAutomaticEmbeds` on a `BlueskyPost` instance, or replace the implementation altogether by swapping `NotificationChannels\Bluesky\Embeds\EmbedResolver` in the container.
