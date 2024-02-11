@@ -2,8 +2,8 @@
 
 use NotificationChannels\Bluesky\BlueskyPost;
 use NotificationChannels\Bluesky\Embeds\External;
-use NotificationChannels\Bluesky\RichText\Facets\Facet;
-use NotificationChannels\Bluesky\RichText\Facets\Features\Mention;
+use NotificationChannels\Bluesky\Facets\Facet;
+use NotificationChannels\Bluesky\Facets\Mention;
 
 it('can be converted to an array', function () {
     $post = BlueskyPost::make()

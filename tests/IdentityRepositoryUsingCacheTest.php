@@ -3,7 +3,7 @@
 use Illuminate\Cache\Repository as CacheRepository;
 use NotificationChannels\Bluesky\Exceptions\NoBlueskyIdentityFound;
 use NotificationChannels\Bluesky\IdentityRepository\IdentityRepositoryUsingCache;
-use NotificationChannels\Bluesky\Tests\Factories\BlueskyClientResponseFactory;
+use NotificationChannels\Bluesky\Tests\Factories\HttpResponsesFactory;
 
 beforeEach(function () {
     app()->when(IdentityRepositoryUsingCache::class)
@@ -12,7 +12,7 @@ beforeEach(function () {
 });
 
 test('`setIdentity` stores an identity in the cache', function () {
-    $identity = BlueskyClientResponseFactory::createIdentity();
+    $identity = HttpResponsesFactory::createIdentity();
 
     /** @var IdentityRepositoryUsingCache */
     $identityRepository = resolve(IdentityRepositoryUsingCache::class);
@@ -24,7 +24,7 @@ test('`setIdentity` stores an identity in the cache', function () {
 });
 
 test('`getIdentity` returns the stored identity', function () {
-    $identity = BlueskyClientResponseFactory::createIdentity();
+    $identity = HttpResponsesFactory::createIdentity();
 
     /** @var IdentityRepositoryUsingCache */
     $identityRepository = resolve(IdentityRepositoryUsingCache::class);
@@ -42,7 +42,7 @@ test('`getIdentity` throws when no identity is stored', function () {
 });
 
 test('`clearIdentity` clears the stored identity', function () {
-    $identity = BlueskyClientResponseFactory::createIdentity();
+    $identity = HttpResponsesFactory::createIdentity();
 
     /** @var IdentityRepositoryUsingCache */
     $identityRepository = resolve(IdentityRepositoryUsingCache::class);
@@ -55,7 +55,7 @@ test('`clearIdentity` clears the stored identity', function () {
 });
 
 test('`hasIdentity` returns `true` when an identity is stored', function () {
-    $identity = BlueskyClientResponseFactory::createIdentity();
+    $identity = HttpResponsesFactory::createIdentity();
 
     /** @var IdentityRepositoryUsingCache */
     $identityRepository = resolve(IdentityRepositoryUsingCache::class);

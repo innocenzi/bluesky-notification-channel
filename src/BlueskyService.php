@@ -3,8 +3,8 @@
 namespace NotificationChannels\Bluesky;
 
 use NotificationChannels\Bluesky\Embeds\EmbedResolver;
+use NotificationChannels\Bluesky\Facets\FacetsResolver;
 use NotificationChannels\Bluesky\IdentityRepository\IdentityRepository;
-use NotificationChannels\Bluesky\RichText\Facets\Facet;
 
 final class BlueskyService
 {
@@ -13,6 +13,7 @@ final class BlueskyService
         protected readonly IdentityRepository $identityRepository,
         protected readonly SessionManager $sessionManager,
         protected readonly EmbedResolver $embedResolver,
+        protected readonly FacetsResolver $facetsResolver,
     ) {
     }
 
@@ -39,7 +40,7 @@ final class BlueskyService
         }
 
         if ($post->automaticallyResolvesFacets()) {
-            $post->facets(facets: Facet::resolveFacets($post->text, $this->client));
+            $post->facets(facets: $this->facetsResolver->resolve($this, $post));
         }
 
         // Embeds depends on facets, so they must be resolved after
@@ -48,5 +49,10 @@ final class BlueskyService
         }
 
         return $post;
+    }
+
+    public function getClient(): BlueskyClient
+    {
+        return $this->client;
     }
 }

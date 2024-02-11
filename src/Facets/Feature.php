@@ -1,10 +1,10 @@
 <?php
 
-namespace NotificationChannels\Bluesky\Embeds;
+namespace NotificationChannels\Bluesky\Facets;
 
 use NotificationChannels\Bluesky\Support\SerializesToLexiconObject;
 
-abstract class Embed
+abstract class Feature
 {
     use SerializesToLexiconObject;
 }

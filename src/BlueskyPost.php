@@ -7,7 +7,7 @@ use Illuminate\Support\Traits\Conditionable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\Tappable;
 use NotificationChannels\Bluesky\Embeds\Embed;
-use NotificationChannels\Bluesky\RichText\Facets\Facet;
+use NotificationChannels\Bluesky\Facets\Facet;
 
 class BlueskyPost
 {

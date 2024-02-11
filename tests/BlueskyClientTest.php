@@ -7,11 +7,11 @@ use NotificationChannels\Bluesky\Exceptions\CouldNotCreateSession;
 use NotificationChannels\Bluesky\Exceptions\CouldNotRefreshSession;
 use NotificationChannels\Bluesky\Exceptions\CouldNotResolveHandle;
 use NotificationChannels\Bluesky\Exceptions\CouldNotUploadBlob;
-use NotificationChannels\Bluesky\Tests\Factories\BlueskyClientResponseFactory;
+use NotificationChannels\Bluesky\Tests\Factories\HttpResponsesFactory;
 
 describe('createIdentity', function () {
     it('can create an identity', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::CREATE_SESSION_ENDPOINT => ['handle' => 'uwu'],
         ]);
 
@@ -23,7 +23,7 @@ describe('createIdentity', function () {
     });
 
     it('throws when the wrong credentials are given', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::CREATE_SESSION_ENDPOINT => [':status' => 401],
         ]);
 
@@ -33,7 +33,7 @@ describe('createIdentity', function () {
     })->throws(CouldNotCreateSession::class, 'Could not create session (401)');
 
     it('throws when the account has been taken down', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::CREATE_SESSION_ENDPOINT => [
                 ':status' => 400,
                 'error' => 'AccountTakedown',
@@ -47,7 +47,7 @@ describe('createIdentity', function () {
     })->throws(CouldNotCreateSession::class, 'Account is suspended (400, AccountTakedown)');
 
     it('throws on bad requests', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::CREATE_SESSION_ENDPOINT => [':status' => 400],
         ]);
 
@@ -57,7 +57,7 @@ describe('createIdentity', function () {
     })->throws(CouldNotCreateSession::class, 'Could not create session (400)');
 
     it('throws when token is expired', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::CREATE_SESSION_ENDPOINT => [
                 ':status' => 400,
                 'error' => 'ExpiredToken',
@@ -71,7 +71,7 @@ describe('createIdentity', function () {
     })->throws(CouldNotCreateSession::class, 'Token is expired (400, ExpiredToken)');
 
     it('throws when token is invalid', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::CREATE_SESSION_ENDPOINT => [
                 ':status' => 400,
                 'error' => 'InvalidToken',
@@ -87,7 +87,7 @@ describe('createIdentity', function () {
 
 describe('createPost', function () {
     it('can create a post', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::CREATE_RECORD_ENDPOINT => ['uri' => 'foo'],
         ]);
 
@@ -103,15 +103,7 @@ describe('createPost', function () {
     });
 
     it('can create a post with an embed', function () {
-        BlueskyClientResponseFactory::fake([
-            'https://cardyb.bsky.app/v1/extract*' => [
-                'error' => '',
-                'url' => 'https://innocenzi.dev',
-                'title' => 'Enzo Innocenzi - Software developer',
-                'description' => 'I am too lazy to copy it',
-                'image' => 'https://cardyb.bsky.app/v1/image?url=https%3A%2F%2Finnocenzi.dev%2Fog.jpg',
-            ],
-        ]);
+        HttpResponsesFactory::fake();
 
         /** @var BlueskyClient */
         $client = resolve(BlueskyClient::class);
@@ -125,7 +117,7 @@ describe('createPost', function () {
     });
 
     it('throws when token is expired', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::CREATE_RECORD_ENDPOINT => [
                 ':status' => 400,
                 'error' => 'ExpiredToken',
@@ -144,7 +136,7 @@ describe('createPost', function () {
 
 describe('refreshIdentity', function () {
     it('can refresh an identity', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::REFRESH_SESSION_ENDPOINT => ['handle' => 'owo'],
         ]);
 
@@ -157,7 +149,7 @@ describe('refreshIdentity', function () {
     });
 
     it('throws when the refresh token is expired', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::REFRESH_SESSION_ENDPOINT => [
                 ':status' => 400,
                 'error' => 'ExpiredToken',
@@ -175,7 +167,7 @@ describe('refreshIdentity', function () {
 
 describe('resolveHandle', function () {
     it('can resolve a handle to a did', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::RESOLVE_HANDLE_ENDPOINT => ['did' => 'did:example:123'],
         ]);
 
@@ -187,7 +179,7 @@ describe('resolveHandle', function () {
     });
 
     it('throws when the refresh token is expired', function () {
-        BlueskyClientResponseFactory::fake([
+        HttpResponsesFactory::fake([
             BlueskyClient::RESOLVE_HANDLE_ENDPOINT => [
                 ':status' => 400,
                 'error' => 'ExpiredToken',
@@ -203,7 +195,7 @@ describe('resolveHandle', function () {
 
 describe('uploadBlob', function () {
     it('throws when no file is provided', function () {
-        BlueskyClientResponseFactory::fake();
+        HttpResponsesFactory::fake();
 
         /** @var BlueskyClient */
         $client = resolve(BlueskyClient::class);
@@ -214,7 +206,7 @@ describe('uploadBlob', function () {
     })->throws(CouldNotUploadBlob::class);
 
     it('can upload a blob via an external url', function () {
-        BlueskyClientResponseFactory::fake();
+        HttpResponsesFactory::fake();
 
         /** @var BlueskyService */
         $client = resolve(BlueskyClient::class);

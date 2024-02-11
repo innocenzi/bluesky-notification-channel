@@ -2,10 +2,10 @@
 
 use NotificationChannels\Bluesky\BlueskyClient;
 use NotificationChannels\Bluesky\SessionManager;
-use NotificationChannels\Bluesky\Tests\Factories\BlueskyClientResponseFactory;
+use NotificationChannels\Bluesky\Tests\Factories\HttpResponsesFactory;
 
 test('`getIdentity` generates an identity when none exist', function () {
-    BlueskyClientResponseFactory::fake([
+    HttpResponsesFactory::fake([
         BlueskyClient::CREATE_SESSION_ENDPOINT => ['handle' => 'owo'],
         BlueskyClient::REFRESH_SESSION_ENDPOINT => ['handle' => 'uwu'],
     ]);
@@ -21,7 +21,7 @@ test('`getIdentity` generates an identity when none exist', function () {
 // will need to be changed if/when we decide not to refresh
 // sessions if they are not close to their expiration date
 test('`getIdentity` refreshes the session automatically', function () {
-    BlueskyClientResponseFactory::fake([
+    HttpResponsesFactory::fake([
         BlueskyClient::CREATE_SESSION_ENDPOINT => ['handle' => 'owo'],
         BlueskyClient::REFRESH_SESSION_ENDPOINT => ['handle' => 'uwu'],
     ]);

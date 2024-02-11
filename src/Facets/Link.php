@@ -1,10 +1,8 @@
 <?php
 
-namespace NotificationChannels\Bluesky\RichText\Facets\Features;
+namespace NotificationChannels\Bluesky\Facets;
 
-use NotificationChannels\Bluesky\RichText\Facets\FacetFeature;
-
-final class Link extends FacetFeature
+final class Link extends Feature
 {
     public function __construct(
         public readonly string $uri,

@@ -1,13 +1,19 @@
 <?php
 
 use NotificationChannels\Bluesky\BlueskyClient;
-use NotificationChannels\Bluesky\RichText\Facets\Facet;
-use NotificationChannels\Bluesky\Tests\Factories\BlueskyClientResponseFactory;
+use NotificationChannels\Bluesky\BlueskyPost;
+use NotificationChannels\Bluesky\BlueskyService;
+use NotificationChannels\Bluesky\Facets\FacetsResolver;
+use NotificationChannels\Bluesky\Tests\Factories\HttpResponsesFactory;
 use Pest\Expectation;
 
 it('detects links', function (string $url, array $positions) {
-    $client = resolve(BlueskyClient::class);
-    $facets = Facet::resolveFacets("Hello please take a look at {$url}, this is pretty cool website", $client);
+    /** @var FacetsResolver */
+    $resolver = resolve(FacetsResolver::class);
+    $facets = $resolver->resolve(
+        bluesky: resolve(BlueskyService::class),
+        post: BlueskyPost::make()->text("Hello please take a look at {$url}, this is pretty cool website"),
+    );
 
     expect($facets)->sequence(
         fn (Expectation $facet) => $facet->toArray()->toBe([
@@ -34,14 +40,18 @@ it('detects links', function (string $url, array $positions) {
 ]);
 
 it('detect multiple mentions', function () {
-    BlueskyClientResponseFactory::fake([
+    HttpResponsesFactory::fake([
         BlueskyClient::RESOLVE_HANDLE_ENDPOINT => [
             'did' => 'did:plc:123',
         ],
     ]);
 
-    $client = resolve(BlueskyClient::class);
-    $facets = Facet::resolveFacets('Hello @innocenzi.dev and @laravelnews.bsky.social', $client);
+    /** @var FacetsResolver */
+    $resolver = resolve(FacetsResolver::class);
+    $facets = $resolver->resolve(
+        bluesky: resolve(BlueskyService::class),
+        post: BlueskyPost::make()->text('Hello @innocenzi.dev and @laravelnews.bsky.social'),
+    );
 
     expect($facets)->sequence(
         fn (Expectation $facet) => $facet->toArray()->toBe([
@@ -74,10 +84,14 @@ it('detect multiple mentions', function () {
 });
 
 it('detects multiple facets', function () {
-    BlueskyClientResponseFactory::fake();
+    HttpResponsesFactory::fake();
 
-    $client = resolve(BlueskyClient::class);
-    $facets = Facet::resolveFacets('Hi @innocenzi.dev, is your website https://innocenzi.dev?', $client);
+    /** @var FacetsResolver */
+    $resolver = resolve(FacetsResolver::class);
+    $facets = $resolver->resolve(
+        bluesky: resolve(BlueskyService::class),
+        post: BlueskyPost::make()->text('Hi @innocenzi.dev, is your website https://innocenzi.dev?'),
+    );
 
     expect($facets)->sequence(
         fn (Expectation $facet) => $facet->toArray()->toBe([

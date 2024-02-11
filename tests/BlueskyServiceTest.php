@@ -3,10 +3,10 @@
 use NotificationChannels\Bluesky\BlueskyClient;
 use NotificationChannels\Bluesky\BlueskyPost;
 use NotificationChannels\Bluesky\BlueskyService;
-use NotificationChannels\Bluesky\Tests\Factories\BlueskyClientResponseFactory;
+use NotificationChannels\Bluesky\Tests\Factories\HttpResponsesFactory;
 
 test('it can create a post with a string', function () {
-    BlueskyClientResponseFactory::fake([
+    HttpResponsesFactory::fake([
         BlueskyClient::CREATE_RECORD_ENDPOINT => ['uri' => 'foo'],
     ]);
 
@@ -16,11 +16,11 @@ test('it can create a post with a string', function () {
 
     expect($response)->toBe('foo');
 
-    BlueskyClientResponseFactory::assertSent(['record' => ['text' => 'Hello']]);
+    HttpResponsesFactory::assertSent(['record' => ['text' => 'Hello']]);
 });
 
 test('it can create a post with a `BlueskyPost` instance', function () {
-    BlueskyClientResponseFactory::fake([
+    HttpResponsesFactory::fake([
         BlueskyClient::CREATE_RECORD_ENDPOINT => ['uri' => 'foo'],
     ]);
 
@@ -30,11 +30,11 @@ test('it can create a post with a `BlueskyPost` instance', function () {
 
     expect($response)->toBe('foo');
 
-    BlueskyClientResponseFactory::assertSent(['record' => ['text' => 'Hello']]);
+    HttpResponsesFactory::assertSent(['record' => ['text' => 'Hello']]);
 });
 
 test('it can upload a blob', function () {
-    BlueskyClientResponseFactory::fake();
+    HttpResponsesFactory::fake();
 
     /** @var BlueskyService */
     $service = resolve(BlueskyService::class);

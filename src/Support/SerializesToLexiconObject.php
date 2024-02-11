@@ -1,11 +1,11 @@
 <?php
 
-namespace NotificationChannels\Bluesky\RichText;
+namespace NotificationChannels\Bluesky\Support;
 
 use ReflectionClass;
 use ReflectionProperty;
 
-trait SerializesIntoPost
+trait SerializesToLexiconObject
 {
     public function toArray(): array
     {

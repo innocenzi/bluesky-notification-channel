@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use NotificationChannels\Bluesky\BlueskyClient;
 use NotificationChannels\Bluesky\BlueskyIdentity;
+use NotificationChannels\Bluesky\Embeds\LinkEmbedResolverUsingCardyb;
 
-final class BlueskyClientResponseFactory
+final class HttpResponsesFactory
 {
     private static array $sentRequests = [];
 
@@ -50,6 +51,14 @@ final class BlueskyClientResponseFactory
         ],
     ];
 
+    private static array $fakeCardybResponse = [
+        'error' => '',
+        'url' => 'https://innocenzi.dev',
+        'title' => 'Enzo Innocenzi - Software developer',
+        'description' => 'I am too lazy to copy it',
+        'image' => 'https://cardyb.bsky.app/v1/image?url=https%3A%2F%2Finnocenzi.dev%2Fog.jpg',
+    ];
+
     public static function assertSent(array $expected): void
     {
         // TODO: must check that somewhere in $sentRequests, the properties and values of $expected are included
@@ -70,6 +79,7 @@ final class BlueskyClientResponseFactory
         $endpoints[BlueskyClient::CREATE_RECORD_ENDPOINT] ??= [];
         $endpoints[BlueskyClient::RESOLVE_HANDLE_ENDPOINT] ??= [];
         $endpoints[BlueskyClient::UPLOAD_BLOB_ENDPOINT] ??= [];
+        $endpoints[LinkEmbedResolverUsingCardyb::ENDPOINT] ??= [];
 
         foreach ($endpoints as $endpoint => $data) {
             if (is_numeric($endpoint)) {
@@ -84,6 +94,7 @@ final class BlueskyClientResponseFactory
                     BlueskyClient::REFRESH_SESSION_ENDPOINT => self::fakeRefreshSessionResponse($data ?? []),
                     BlueskyClient::RESOLVE_HANDLE_ENDPOINT => self::fakeResolveHandleResponse($data ?? []),
                     BlueskyClient::UPLOAD_BLOB_ENDPOINT => self::fakeUploadBlobResponse($data ?? []),
+                    LinkEmbedResolverUsingCardyb::ENDPOINT => self::fakeCardybResponse($data ?? []),
                     default => $data
                 },
                 status: $status,
@@ -139,6 +150,14 @@ final class BlueskyClientResponseFactory
     {
         return [
             ...self::$fakeUploadBlobResponse,
+            ...$data,
+        ];
+    }
+
+    public static function fakeCardybResponse(array $data = []): array
+    {
+        return [
+            ...self::$fakeCardybResponse,
             ...$data,
         ];
     }

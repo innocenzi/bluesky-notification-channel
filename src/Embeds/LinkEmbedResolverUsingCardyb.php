@@ -5,11 +5,13 @@ namespace NotificationChannels\Bluesky\Embeds;
 use Illuminate\Support\Facades\Http;
 use NotificationChannels\Bluesky\BlueskyPost;
 use NotificationChannels\Bluesky\BlueskyService;
-use NotificationChannels\Bluesky\RichText\Facets\Facet;
-use NotificationChannels\Bluesky\RichText\Facets\FacetFeature;
+use NotificationChannels\Bluesky\Facets\Facet;
+use NotificationChannels\Bluesky\Facets\Feature;
 
 final class LinkEmbedResolverUsingCardyb implements EmbedResolver
 {
+    public const ENDPOINT = 'https://cardyb.bsky.app/v1/extract';
+
     public function resolve(BlueskyService $bluesky, BlueskyPost $post): ?Embed
     {
         if (\count($post->facets) === 0) {
@@ -19,7 +21,7 @@ final class LinkEmbedResolverUsingCardyb implements EmbedResolver
         /** @var Facet */
         $firstLink = collect($post->facets)->first(
             callback: fn (Facet $facet) => collect($facet->getFeatures())->first(
-                callback: fn (FacetFeature $feature) => $feature->getType() === 'app.bsky.richtext.facet#link',
+                callback: fn (Feature $feature) => $feature->getType() === 'app.bsky.richtext.facet#link',
             ),
         );
 
@@ -27,7 +29,7 @@ final class LinkEmbedResolverUsingCardyb implements EmbedResolver
             return null;
         }
 
-        $embed = Http::get('https://cardyb.bsky.app/v1/extract', [
+        $embed = Http::get(self::ENDPOINT, [
             'url' => $firstLink->getFeatures()[0]->uri,
         ]);
 
