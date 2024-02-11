@@ -8,9 +8,8 @@ final class External extends Embed
         public readonly string $uri,
         public readonly string $title,
         public readonly string $description,
-        public readonly array $thumb,
-    ) {
-    }
+        public readonly ?array $thumb = null,
+    ) {}
 
     public function getType(): string
     {
