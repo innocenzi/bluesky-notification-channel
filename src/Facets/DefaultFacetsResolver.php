@@ -17,6 +17,7 @@ final class DefaultFacetsResolver implements FacetsResolver
         return [
             ...self::detectMentions($text, $bluesky->getClient()),
             ...self::detectLinks($text),
+            ...self::detectTags($text)
         ];
     }
 
@@ -67,5 +68,32 @@ final class DefaultFacetsResolver implements FacetsResolver
                 ],
             );
         }, $matches[1]);
+    }
+
+    /** @return array<Facet> */
+    private static function detectTags(string $text): array
+    {
+        $tagRegexp = '/(?:^|\\s)(#[^\\d\\s]\\S*)(?=\\s)?/';
+
+        preg_match_all($tagRegexp, $text, $matches, \PREG_OFFSET_CAPTURE);
+
+
+        return array_filter(array_map(function (array $match) {
+            [$tag, $position] = $match;
+
+            $tag = preg_replace("/\\p{P}+$/u", "", $tag);
+
+            if(strlen($tag) > 66) {return null;}
+
+            return new Facet(
+                range: [
+                    $position,
+                    $position + mb_strlen($tag),
+                ],
+                features: [
+                    new Tag(tag: substr($tag, 1)),
+                ],
+            );
+        }, $matches[1]));
     }
 }
