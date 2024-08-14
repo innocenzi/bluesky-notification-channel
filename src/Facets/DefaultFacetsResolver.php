@@ -17,7 +17,7 @@ final class DefaultFacetsResolver implements FacetsResolver
         return [
             ...self::detectMentions($text, $bluesky->getClient()),
             ...self::detectLinks($text),
-            ...self::detectTags($text)
+            ...self::detectTags($text),
         ];
     }
 
@@ -77,13 +77,14 @@ final class DefaultFacetsResolver implements FacetsResolver
 
         preg_match_all($tagRegexp, $text, $matches, \PREG_OFFSET_CAPTURE);
 
-
         return array_filter(array_map(function (array $match) {
             [$tag, $position] = $match;
 
-            $tag = preg_replace("/\\p{P}+$/u", "", $tag);
+            $tag = preg_replace('/\\p{P}+$/u', '', $tag);
 
-            if(strlen($tag) > 66) {return null;}
+            if (\strlen($tag) > 66) {
+                return null;
+            }
 
             return new Facet(
                 range: [

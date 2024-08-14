@@ -123,14 +123,13 @@ it('detects multiple facets', function () {
     );
 });
 
-it('detects tags', function (string $text, array $positions, string $tag){
-     /** @var FacetsResolver */
+it('detects tags', function (string $text, array $positions, string $tag) {
+    /** @var FacetsResolver */
     $resolver = resolve(FacetsResolver::class);
     $facets = $resolver->resolve(
         bluesky: resolve(BlueskyService::class),
         post: BlueskyPost::make()->text($text),
     );
-
 
     expect($facets)->sequence(
         fn (Expectation $facet) => $facet->toArray()->toBe([
@@ -151,11 +150,11 @@ it('detects tags', function (string $text, array $positions, string $tag){
     ['A post with a #tag inline', [14, 18], 'tag'],
     ['#tag starting the post', [0, 4], 'tag'],
     ['a post ended by a #tag', [18, 22], 'tag'],
-    ['a tag that ends #with! punctuation',[16,21], 'with'],
+    ['a tag that ends #with! punctuation', [16, 21], 'with'],
     ['a post with #anextremelylongtagwhichisjustunderblueskys64charactertaglimit!', [12, 74], 'anextremelylongtagwhichisjustunderblueskys64charactertaglimit'],
 ]);
 
-it('doesnt detect non tags', function(string $text) {
+it('doesnt detect non tags', function (string $text) {
     /** @var FacetsResolver */
     $resolver = resolve(FacetsResolver::class);
     $facets = $resolver->resolve(
@@ -165,13 +164,12 @@ it('doesnt detect non tags', function(string $text) {
 
     expect($facets)->toBe([]);
 })->with([
-        ['A real#tag must start with space'],
-        ['a #1tag can not have a number'],
-        ['an #anextremelylongtagwhichisabsolutlyoverblueskys64charactertaglimitisnotaddedasatag'],
-    ]);
+    ['A real#tag must start with space'],
+    ['a #1tag can not have a number'],
+    ['an #anextremelylongtagwhichisabsolutlyoverblueskys64charactertaglimitisnotaddedasatag'],
+]);
 
 it('detects multiple tags', function () {
-
     /** @var FacetsResolver */
     $resolver = resolve(FacetsResolver::class);
     $facets = $resolver->resolve(
