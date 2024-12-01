@@ -44,9 +44,19 @@ final class BlueskyService
         }
 
         // Embeds depends on facets, so they must be resolved after
-        if ($post->automaticallyResolvesEmbeds()) {
-            $post->embed(embed: $this->embedResolver->resolve($this, $post));
+        $embed = null;
+
+        // At first try to resolve an embed using the given URL
+        if ($post->embedUrl) {
+            $embed = $this->embedResolver->createEmbedFromUrl($this, $post->embedUrl);
         }
+
+        // Then try to resolve embeds using links provided in the post's text
+        if (\is_null($embed) && $post->automaticallyResolvesEmbeds()) {
+            $embed = $this->embedResolver->resolve($this, $post);
+        }
+
+        $post->embed(embed: $embed);
 
         return $post;
     }

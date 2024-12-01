@@ -23,6 +23,7 @@ class BlueskyPost
         public array $facets = [],
         public ?Embed $embed = null,
         public array $languages = [],
+        public ?string $embedUrl = null,
     ) {
     }
 
@@ -131,6 +132,16 @@ class BlueskyPost
     public function text(?string $text): static
     {
         $this->text = $text ?? '';
+
+        return $this;
+    }
+
+    /**
+     * Sets the URL to be resolved as an embed.
+     */
+    public function embedUrl(string $embedUrl): static
+    {
+        $this->embedUrl = $embedUrl;
 
         return $this;
     }

@@ -29,8 +29,13 @@ final class LinkEmbedResolverUsingCardyb implements EmbedResolver
             return null;
         }
 
+        return $this->createEmbedFromUrl($bluesky, $firstLink->getFeatures()[0]->uri);
+    }
+
+    public function createEmbedFromUrl(BlueskyService $bluesky, string $url): ?Embed
+    {
         $embed = Http::get(self::ENDPOINT, [
-            'url' => $firstLink->getFeatures()[0]->uri,
+            'url' => $url,
         ]);
 
         if ($embed->json('error')) {

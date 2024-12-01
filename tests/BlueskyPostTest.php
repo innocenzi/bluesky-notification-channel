@@ -77,3 +77,9 @@ it('has an accessble `facets` property', function () {
 
     expect($post->facets)->toBe([]);
 });
+
+it('has an accessble `embedUrl` property', function () {
+    $post = BlueskyPost::make()->text('foo')->embedUrl('https://bsky.app');
+
+    expect($post->embedUrl)->toBe('https://bsky.app');
+});
