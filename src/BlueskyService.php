@@ -26,7 +26,7 @@ final class BlueskyService
         );
     }
 
-    public function uploadBlob(string $pathOrUrl): Blob
+    public function uploadBlob(string $pathOrUrl): ?Blob
     {
         return $this->client->uploadBlob(
             identity: $this->sessionManager->getIdentity(),
@@ -54,11 +54,11 @@ final class BlueskyService
         if ($post->embedUrl) {
             return $this->embedResolver->createEmbedFromUrl($this, $post->embedUrl);
         }
-        
+
         if ($post->automaticallyResolvesEmbeds()) {
             return $this->embedResolver->resolve($this, $post);
         }
-    
+
         return null;
     }
 
