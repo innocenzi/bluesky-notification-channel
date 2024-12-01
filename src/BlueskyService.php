@@ -2,6 +2,7 @@
 
 namespace NotificationChannels\Bluesky;
 
+use NotificationChannels\Bluesky\Embeds\Embed;
 use NotificationChannels\Bluesky\Embeds\EmbedResolver;
 use NotificationChannels\Bluesky\Facets\FacetsResolver;
 use NotificationChannels\Bluesky\IdentityRepository\IdentityRepository;
@@ -43,22 +44,22 @@ final class BlueskyService
             $post->facets(facets: $this->facetsResolver->resolve($this, $post));
         }
 
-        // Embeds depends on facets, so they must be resolved after
-        $embed = null;
-
-        // At first try to resolve an embed using the given URL
-        if ($post->embedUrl) {
-            $embed = $this->embedResolver->createEmbedFromUrl($this, $post->embedUrl);
-        }
-
-        // Then try to resolve embeds using links provided in the post's text
-        if (\is_null($embed) && $post->automaticallyResolvesEmbeds()) {
-            $embed = $this->embedResolver->resolve($this, $post);
-        }
-
-        $post->embed(embed: $embed);
+        $post->embed($this->resolveEmbed($post));
 
         return $post;
+    }
+
+    private function resolveEmbed(BlueskyPost $post): ?Embed
+    {
+        if ($post->embedUrl) {
+            return $this->embedResolver->createEmbedFromUrl($this, $post->embedUrl);
+        }
+        
+        if ($post->automaticallyResolvesEmbeds()) {
+            return $this->embedResolver->resolve($this, $post);
+        }
+    
+        return null;
     }
 
     public function getClient(): BlueskyClient
