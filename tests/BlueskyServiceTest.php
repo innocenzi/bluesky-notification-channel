@@ -3,6 +3,8 @@
 use NotificationChannels\Bluesky\BlueskyClient;
 use NotificationChannels\Bluesky\BlueskyPost;
 use NotificationChannels\Bluesky\BlueskyService;
+use NotificationChannels\Bluesky\Embeds\External;
+use NotificationChannels\Bluesky\Embeds\LinkEmbedResolverUsingCardyb;
 use NotificationChannels\Bluesky\Tests\Factories\HttpResponsesFactory;
 
 test('it can create a post with a string', function () {
@@ -49,3 +51,26 @@ test('it can upload a blob', function () {
         'size' => 17066,
     ]);
 })->skip('Needs updating');
+
+test('the embed specified in the post is used', function () {
+    HttpResponsesFactory::fake([
+        LinkEmbedResolverUsingCardyb::ENDPOINT => [
+            'error' => '',
+            'url' => 'https://google.fr',
+            'title' => 'Google',
+            'description' => 'I am too lazy to copy it',
+        ]
+    ]);
+
+    $post = BlueskyPost::make()
+        ->withoutAutomaticEmbeds()
+        ->embedUrl('https://google.fr');
+
+    /** @var BlueskyService */
+    $service = resolve(BlueskyService::class);
+    $service->resolvePost($post);
+
+    expect($post->embed)
+        ->toBeInstanceOf(External::class)
+        ->title->toBe('Google');
+});
