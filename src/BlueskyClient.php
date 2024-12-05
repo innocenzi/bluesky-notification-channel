@@ -20,6 +20,7 @@ final class BlueskyClient
     public const CREATE_RECORD_ENDPOINT = 'com.atproto.repo.createRecord';
     public const UPLOAD_BLOB_ENDPOINT = 'com.atproto.repo.uploadBlob';
     public const RESOLVE_HANDLE_ENDPOINT = 'com.atproto.identity.resolveHandle';
+    public const BLOB_SIZE_LIMIT = 1_000_000;
 
     public function __construct(
         protected readonly HttpClient $httpClient,
@@ -100,7 +101,7 @@ final class BlueskyClient
         return $response->json('uri');
     }
 
-    public function uploadBlob(BlueskyIdentity $identity, string $pathOrUrl): Blob
+    public function uploadBlob(BlueskyIdentity $identity, string $pathOrUrl): ?Blob
     {
         $content = null;
 
@@ -116,6 +117,10 @@ final class BlueskyClient
 
         if (!$content) {
             throw CouldNotUploadBlob::couldNotLoadImage();
+        }
+
+        if (strlen($content) > self::BLOB_SIZE_LIMIT) {
+            return null;
         }
 
         $response = $this->httpClient
