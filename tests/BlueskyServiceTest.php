@@ -52,7 +52,7 @@ test('it can upload a blob', function () {
     ]);
 })->skip('Needs updating');
 
-test('the embed specified in the post is used', function () {
+test('the embed url specified in the post is resolved', function () {
     HttpResponsesFactory::fake([
         LinkEmbedResolverUsingCardyb::ENDPOINT => [
             'error' => '',
@@ -73,4 +73,19 @@ test('the embed specified in the post is used', function () {
     expect($post->embed)
         ->toBeInstanceOf(External::class)
         ->title->toBe('Google');
+});
+
+test('the embed specified in the post is used', function () {
+    $post = BlueskyPost::make()
+        ->withoutAutomaticEmbeds()
+        ->embed(new External('https://foo.fr', 'Foo', 'Bar'));
+
+    /** @var BlueskyService */
+    $service = resolve(BlueskyService::class);
+    $service->resolvePost($post);
+
+    expect($post->embed)
+        ->toBeInstanceOf(External::class)
+        ->uri->toBe('https://foo.fr')
+        ->title->toBe('Foo');
 });
