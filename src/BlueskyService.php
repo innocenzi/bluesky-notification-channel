@@ -44,7 +44,9 @@ final class BlueskyService
             $post->facets(facets: $this->facetsResolver->resolve($this, $post));
         }
 
-        $post->embed($this->resolveEmbed($post));
+        if ($embed = $this->resolveEmbed($post)) {
+            $post->embed(embed: $embed);
+        }
 
         return $post;
     }
