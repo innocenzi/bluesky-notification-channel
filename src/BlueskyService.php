@@ -26,7 +26,7 @@ final class BlueskyService
         );
     }
 
-    public function uploadBlob(string $pathOrUrl): Blob
+    public function uploadBlob(string $pathOrUrl): ?Blob
     {
         return $this->client->uploadBlob(
             identity: $this->sessionManager->getIdentity(),
