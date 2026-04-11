@@ -42,13 +42,13 @@ final class LinkEmbedResolverUsingCardyb implements EmbedResolver
             return null;
         }
 
+        $thumbnail = $bluesky->uploadBlob($embed->json('image'));
+
         return new External(
             uri: $embed->json('url'),
             title: $embed->json('title'),
             description: $embed->json('description'),
-            thumb: $bluesky
-                ->uploadBlob($embed->json('image'))
-                ->toArray(),
+            thumb: !\is_null($thumbnail) ? $thumbnail->toArray() : null,
         );
     }
 }
